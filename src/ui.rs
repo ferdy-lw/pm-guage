@@ -31,16 +31,10 @@ pub static VOLTAGE: RwLock<f32> = RwLock::new(0f32);
 pub static FUEL_LEVEL: AtomicU16 = AtomicU16::new(0);
 pub static AVG_CONS: AtomicU16 = AtomicU16::new(0);
 
-// static INFO: RwLock<Option<&CString>> = RwLock::new(None);
-static INFO: RwLock<Option<&CStr>> = RwLock::new(None);
+static INFO: RwLock<&CStr> = RwLock::new(c"");
 pub static STATUS: RwLock<Option<CString>> = RwLock::new(None);
 
-static EMPTY2: LazyLock<CString> = LazyLock::new(|| CString::new("").unwrap());
-static EMPTY: &CStr = c"";
-// static NO_PEER: LazyLock<CString> = LazyLock::new(|| CString::new("NO OBD").unwrap());
-static NO_PEER: &CStr = c"NO OBD";
-// static LOST_CLIENT: LazyLock<CString> = LazyLock::new(|| CString::new("LOST OBD").unwrap());
-static LOST_CLIENT: &CStr = c"LOST OBD";
+static EMPTY_STR: LazyLock<CString> = LazyLock::new(|| CString::new("").unwrap());
 
 pub enum Info {
     None,
@@ -51,12 +45,12 @@ pub enum Info {
 impl Info {
     pub fn set_info(info: &Info) {
         let info = match info {
-            Info::None => EMPTY,
-            Info::NoPeer => NO_PEER,
-            Info::LostClient => LOST_CLIENT,
+            Info::None => c"",
+            Info::NoPeer => c"NO OBD",
+            Info::LostClient => c"LOST OBD",
         };
 
-        INFO.write().unwrap().replace(info);
+        *INFO.write().unwrap() = info;
     }
 }
 
@@ -64,7 +58,12 @@ impl Info {
 //-------
 #[unsafe(no_mangle)]
 pub extern "C" fn get_var_status() -> *const ::core::ffi::c_char {
-    STATUS.read().unwrap().as_ref().unwrap_or(&EMPTY2).as_ptr()
+    STATUS
+        .read()
+        .unwrap()
+        .as_ref()
+        .unwrap_or(&EMPTY_STR)
+        .as_ptr()
 }
 
 #[unsafe(no_mangle)]
@@ -76,7 +75,7 @@ pub extern "C" fn set_var_status(_value: *const ::core::ffi::c_char) {
 //------
 #[unsafe(no_mangle)]
 pub extern "C" fn get_var_info() -> *const ::core::ffi::c_char {
-    INFO.read().unwrap().unwrap_or(EMPTY).as_ptr()
+    (*INFO.read().unwrap()).as_ptr()
 }
 
 #[unsafe(no_mangle)]
