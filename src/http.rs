@@ -3,17 +3,17 @@ use std::{thread, time::Duration};
 
 use embedded_svc::{http::client::Client as HttpClient, io::Write, utils::io};
 
+use esp_idf_svc::http::Method;
 use esp_idf_svc::http::client::EspHttpConnection;
 use esp_idf_svc::http::server::EspHttpServer;
-use esp_idf_svc::http::Method;
-use esp_idf_svc::sys::{heap_caps_get_free_size, MALLOC_CAP_DEFAULT};
+use esp_idf_svc::sys::{MALLOC_CAP_DEFAULT, heap_caps_get_free_size};
 use log::{debug, error, info};
 
 use anyhow::{Context, Result};
 
 use crate::command::{OBDCommand, OBDResponse};
 use crate::elm327;
-use crate::error::{ReadObdError, MSG_LOGGER};
+use crate::error::{MSG_LOGGER, ReadObdError};
 use crate::espnow::PEER;
 use crate::ui::{Info, STATUS};
 
@@ -33,13 +33,17 @@ pub fn service_loop() -> Result<()> {
                 (OBDCommand::oil(), 1),
                 (OBDCommand::atf(), 1),
                 (OBDCommand::oil_pressure(), 1),
-                (OBDCommand::vehicle_speed(), 5),
-                (OBDCommand::avg_cons(), 5),
+                (OBDCommand::engine_speed(), 1),
+                (OBDCommand::ipw_1(), 1),
+                // (OBDCommand::maf(), 1),
+                // (OBDCommand::vehicle_speed(), 5),
+                // (OBDCommand::avg_cons(), 5),
                 (OBDCommand::voltage(), 10),
                 (OBDCommand::fuel_level(), 30),
+                (OBDCommand::fuel_cons(), 120),
             ];
 
-            let mut count = 0;
+            let mut count: i32 = 0;
 
             loop {
                 for (command, rate) in commands.iter_mut() {
@@ -98,12 +102,11 @@ pub fn service_loop() -> Result<()> {
                     thread::sleep(Duration::from_millis(10));
                 }
 
-                count += 1;
-                thread::sleep(Duration::from_millis(100));
+                count = count.wrapping_add(1);
+                // thread::sleep(Duration::from_millis(100));
 
                 if count % 50 == 0 {
                     print_stack_remaining_size(SERVICE_STACK_SIZE);
-                    count = 0;
                 }
             }
         })?;

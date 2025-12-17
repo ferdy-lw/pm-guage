@@ -1,14 +1,15 @@
 use std::{
-    ffi::CString,
+    ffi::{CStr, CString},
     ptr,
     sync::{
-        atomic::{AtomicU16, AtomicU8, Ordering},
         LazyLock, RwLock,
+        atomic::{AtomicU8, AtomicU16, Ordering},
     },
 };
 
 use esp_idf_svc::sys::lcd_bindings::{
-    lv_area_t, lv_chart_add_series, lv_chart_axis_t,
+    LV_CHART_AXIS_PRIMARY_Y, LV_CHART_TYPE_LINE, LV_CHART_UPDATE_MODE_SHIFT, LV_OPA_20,
+    LV_PART_INDICATOR, LV_PART_MAIN, lv_area_t, lv_chart_add_series, lv_chart_axis_t,
     lv_chart_draw_part_type_t_LV_CHART_DRAW_PART_DIV_LINE_INIT, lv_chart_get_series_next,
     lv_chart_get_x_start_point, lv_chart_get_y_array, lv_chart_refresh, lv_chart_series_t,
     lv_chart_set_all_value, lv_chart_set_axis_tick, lv_chart_set_next_value,
@@ -20,26 +21,26 @@ use esp_idf_svc::sys::lcd_bindings::{
     lv_palette_main, lv_palette_t_LV_PALETTE_BLUE, lv_palette_t_LV_PALETTE_RED,
     lv_palette_t_LV_PALETTE_YELLOW, lv_style_prop_t_LV_STYLE_BORDER_WIDTH,
     lv_style_prop_t_LV_STYLE_PAD_TOP, lvgl_port_lock, lvgl_port_unlock, objects,
-    LV_CHART_AXIS_PRIMARY_Y, LV_CHART_TYPE_LINE, LV_CHART_UPDATE_MODE_SHIFT, LV_OPA_20,
-    LV_PART_INDICATOR, LV_PART_MAIN,
 };
 
 pub static COOLANT_TEMP: RwLock<f32> = RwLock::new(0f32);
 pub static ENGINE_TEMP: RwLock<f32> = RwLock::new(0f32);
 pub static TRANS_TEMP: RwLock<f32> = RwLock::new(0f32);
-pub static VEHICLE_SPEED: AtomicU8 = AtomicU8::new(0);
 pub static OIL_PRESS: AtomicU8 = AtomicU8::new(0);
 pub static VOLTAGE: RwLock<f32> = RwLock::new(0f32);
 pub static FUEL_LEVEL: AtomicU16 = AtomicU16::new(0);
 pub static AVG_CONS: AtomicU16 = AtomicU16::new(0);
 
-static INFO: RwLock<Option<&CString>> = RwLock::new(None);
+// static INFO: RwLock<Option<&CString>> = RwLock::new(None);
+static INFO: RwLock<Option<&CStr>> = RwLock::new(None);
 pub static STATUS: RwLock<Option<CString>> = RwLock::new(None);
 
-static EMPTY: LazyLock<CString> = LazyLock::new(|| CString::new("").unwrap());
-static NO_PEER: LazyLock<CString> = LazyLock::new(|| CString::new("NO PEER").unwrap());
-static LOST_CLIENT: LazyLock<CString> =
-    LazyLock::new(|| CString::new("LOST HTTP ENDPOINT").unwrap());
+static EMPTY2: LazyLock<CString> = LazyLock::new(|| CString::new("").unwrap());
+static EMPTY: &CStr = c"";
+// static NO_PEER: LazyLock<CString> = LazyLock::new(|| CString::new("NO OBD").unwrap());
+static NO_PEER: &CStr = c"NO OBD";
+// static LOST_CLIENT: LazyLock<CString> = LazyLock::new(|| CString::new("LOST OBD").unwrap());
+static LOST_CLIENT: &CStr = c"LOST OBD";
 
 pub enum Info {
     None,
@@ -50,9 +51,9 @@ pub enum Info {
 impl Info {
     pub fn set_info(info: &Info) {
         let info = match info {
-            Info::None => &EMPTY,
-            Info::NoPeer => &NO_PEER,
-            Info::LostClient => &LOST_CLIENT,
+            Info::None => EMPTY,
+            Info::NoPeer => NO_PEER,
+            Info::LostClient => LOST_CLIENT,
         };
 
         INFO.write().unwrap().replace(info);
@@ -63,7 +64,7 @@ impl Info {
 //-------
 #[unsafe(no_mangle)]
 pub extern "C" fn get_var_status() -> *const ::core::ffi::c_char {
-    STATUS.read().unwrap().as_ref().unwrap_or(&EMPTY).as_ptr()
+    STATUS.read().unwrap().as_ref().unwrap_or(&EMPTY2).as_ptr()
 }
 
 #[unsafe(no_mangle)]
@@ -75,7 +76,7 @@ pub extern "C" fn set_var_status(_value: *const ::core::ffi::c_char) {
 //------
 #[unsafe(no_mangle)]
 pub extern "C" fn get_var_info() -> *const ::core::ffi::c_char {
-    INFO.read().unwrap().unwrap_or(&EMPTY).as_ptr()
+    INFO.read().unwrap().unwrap_or(EMPTY).as_ptr()
 }
 
 #[unsafe(no_mangle)]
@@ -169,38 +170,40 @@ pub extern "C" fn set_var_avg_cons(_value: i32) {
 
 /// Create the transmission chart. This MUST be called while holding the lv lock
 pub unsafe fn create_trans_chart() {
-    let chart = objects.trans_chart;
+    unsafe {
+        let chart = objects.trans_chart;
 
-    lv_obj_set_style_width(chart, 0, LV_PART_INDICATOR);
-    lv_chart_set_type(chart, LV_CHART_TYPE_LINE as lv_chart_type_t);
-    lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT as lv_chart_update_mode_t);
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y as lv_chart_axis_t, 40, 60);
-    lv_chart_set_axis_tick(
-        chart,
-        LV_CHART_AXIS_PRIMARY_Y as lv_chart_axis_t,
-        10,
-        5,
-        5,
-        5,
-        true,
-        50,
-    );
+        lv_obj_set_style_width(chart, 0, LV_PART_INDICATOR);
+        lv_chart_set_type(chart, LV_CHART_TYPE_LINE as lv_chart_type_t);
+        lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT as lv_chart_update_mode_t);
+        lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y as lv_chart_axis_t, 40, 60);
+        lv_chart_set_axis_tick(
+            chart,
+            LV_CHART_AXIS_PRIMARY_Y as lv_chart_axis_t,
+            10,
+            5,
+            5,
+            5,
+            true,
+            50,
+        );
 
-    lv_chart_set_point_count(chart, 25);
-    let series1 = lv_chart_add_series(
-        chart,
-        lv_palette_main(lv_palette_t_LV_PALETTE_BLUE),
-        LV_CHART_AXIS_PRIMARY_Y as lv_chart_axis_t,
-    );
+        lv_chart_set_point_count(chart, 25);
+        let series1 = lv_chart_add_series(
+            chart,
+            lv_palette_main(lv_palette_t_LV_PALETTE_BLUE),
+            LV_CHART_AXIS_PRIMARY_Y as lv_chart_axis_t,
+        );
 
-    lv_chart_set_all_value(chart, series1, 50);
+        lv_chart_set_all_value(chart, series1, 50);
 
-    lv_obj_add_event_cb(
-        chart,
-        Some(trans_chart_draw_event_cb),
-        lv_event_code_t_LV_EVENT_DRAW_PART_BEGIN,
-        ptr::null_mut(),
-    );
+        lv_obj_add_event_cb(
+            chart,
+            Some(trans_chart_draw_event_cb),
+            lv_event_code_t_LV_EVENT_DRAW_PART_BEGIN,
+            ptr::null_mut(),
+        );
+    }
 }
 
 const HOT_TRANS: i16 = 200;
@@ -212,88 +215,96 @@ const TICK_COUNT: i16 = 20;
 /// range has gone above the hot point
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn trans_chart_draw_event_cb(event: *mut lv_event_t) {
-    let chart = lv_event_get_target(event);
+    unsafe {
+        let chart = lv_event_get_target(event);
 
-    let draw_part_dsc = *lv_event_get_draw_part_dsc(event);
+        let draw_part_dsc = *lv_event_get_draw_part_dsc(event);
 
-    if draw_part_dsc.type_ == lv_chart_draw_part_type_t_LV_CHART_DRAW_PART_DIV_LINE_INIT {
-        let ser = lv_chart_get_series_next(chart, ptr::null());
+        if draw_part_dsc.type_ == lv_chart_draw_part_type_t_LV_CHART_DRAW_PART_DIV_LINE_INIT {
+            let ser = lv_chart_get_series_next(chart, ptr::null());
 
-        let (min, max) = chart_range(chart, ser);
+            let (min, max) = chart_range(chart, ser);
 
-        if max > WARN_TRANS {
-            let border_width =
-                lv_obj_get_style_prop(chart, LV_PART_MAIN, lv_style_prop_t_LV_STYLE_BORDER_WIDTH)
-                    .num as i16;
-            let pad_top =
-                lv_obj_get_style_prop(chart, LV_PART_MAIN, lv_style_prop_t_LV_STYLE_PAD_TOP).num
-                    as i16;
-            let h = (lv_obj_get_content_height(chart) as i32
-                * (*(chart as *mut lv_chart_t)).zoom_y as i32)
-                >> 8;
-
-            let y_ofs = pad_top + border_width - lv_obj_get_scroll_top(chart);
-
-            let y2 = |tick| (y_ofs as i32 + ((h - 1) * tick as i32) / TICK_COUNT as i32) as i16;
-
-            let (warn, hot) = if min >= HOT_TRANS {
-                // all red
-                (
-                    None,
-                    Some(lv_area_t {
-                        x1: (*chart).coords.x1,
-                        y1: (*chart).coords.y1 + y_ofs,
-                        x2: (*chart).coords.x2,
-                        y2: (*chart).coords.y1 + y2(max - min),
-                    }),
+            if max > WARN_TRANS {
+                let border_width = lv_obj_get_style_prop(
+                    chart,
+                    LV_PART_MAIN,
+                    lv_style_prop_t_LV_STYLE_BORDER_WIDTH,
                 )
-            } else {
-                let hot = 0.max(max - HOT_TRANS); // there may not be any red to show
-                let hot = if hot == 0 { 0 } else { y2(hot) };
+                .num as i16;
+                let pad_top = lv_obj_get_style_prop(
+                    chart,
+                    LV_PART_MAIN,
+                    lv_style_prop_t_LV_STYLE_PAD_TOP,
+                )
+                .num as i16;
+                let h = (lv_obj_get_content_height(chart) as i32
+                    * (*(chart as *mut lv_chart_t)).zoom_y as i32)
+                    >> 8;
 
-                let warn = y2(max - WARN_TRANS.max(min)); // there will always be some yellow because we're not all red
+                let y_ofs = pad_top + border_width - lv_obj_get_scroll_top(chart);
 
-                let warn = Some(lv_area_t {
-                    x1: (*chart).coords.x1,
-                    y1: (*chart).coords.y1 + if hot == 0 { y_ofs } else { hot + 1 },
-                    x2: (*chart).coords.x2,
-                    y2: (*chart).coords.y1 + warn,
-                });
+                let y2 = |tick| (y_ofs as i32 + ((h - 1) * tick as i32) / TICK_COUNT as i32) as i16;
 
-                let hot = if hot == 0 {
-                    None
+                let (warn, hot) = if min >= HOT_TRANS {
+                    // all red
+                    (
+                        None,
+                        Some(lv_area_t {
+                            x1: (*chart).coords.x1,
+                            y1: (*chart).coords.y1 + y_ofs,
+                            x2: (*chart).coords.x2,
+                            y2: (*chart).coords.y1 + y2(max - min),
+                        }),
+                    )
                 } else {
-                    Some(lv_area_t {
+                    let hot = 0.max(max - HOT_TRANS); // there may not be any red to show
+                    let hot = if hot == 0 { 0 } else { y2(hot) };
+
+                    let warn = y2(max - WARN_TRANS.max(min)); // there will always be some yellow because we're not all red
+
+                    let warn = Some(lv_area_t {
                         x1: (*chart).coords.x1,
-                        y1: (*chart).coords.y1 + y_ofs,
+                        y1: (*chart).coords.y1 + if hot == 0 { y_ofs } else { hot + 1 },
                         x2: (*chart).coords.x2,
-                        y2: (*chart).coords.y1 + hot,
-                    })
+                        y2: (*chart).coords.y1 + warn,
+                    });
+
+                    let hot = if hot == 0 {
+                        None
+                    } else {
+                        Some(lv_area_t {
+                            x1: (*chart).coords.x1,
+                            y1: (*chart).coords.y1 + y_ofs,
+                            x2: (*chart).coords.x2,
+                            y2: (*chart).coords.y1 + hot,
+                        })
+                    };
+
+                    (warn, hot)
                 };
 
-                (warn, hot)
+                if let Some(hot_area) = hot {
+                    let mut rect_dsc: lv_draw_rect_dsc_t = Default::default();
+                    lv_draw_rect_dsc_init(&mut rect_dsc);
+
+                    rect_dsc.bg_opa = LV_OPA_20 as _;
+                    rect_dsc.bg_color = lv_palette_main(lv_palette_t_LV_PALETTE_RED);
+
+                    lv_draw_rect(draw_part_dsc.draw_ctx, &rect_dsc, &hot_area);
+                };
+
+                if let Some(warn_area) = warn {
+                    let mut rect_dsc: lv_draw_rect_dsc_t = Default::default();
+                    lv_draw_rect_dsc_init(&mut rect_dsc);
+
+                    rect_dsc.bg_opa = LV_OPA_20 as _;
+                    rect_dsc.bg_color = lv_palette_main(lv_palette_t_LV_PALETTE_YELLOW);
+
+                    lv_draw_rect(draw_part_dsc.draw_ctx, &rect_dsc, &warn_area);
+                };
             };
-
-            if let Some(hot_area) = hot {
-                let mut rect_dsc: lv_draw_rect_dsc_t = Default::default();
-                lv_draw_rect_dsc_init(&mut rect_dsc);
-
-                rect_dsc.bg_opa = LV_OPA_20 as _;
-                rect_dsc.bg_color = lv_palette_main(lv_palette_t_LV_PALETTE_RED);
-
-                lv_draw_rect(draw_part_dsc.draw_ctx, &rect_dsc, &hot_area);
-            };
-
-            if let Some(warn_area) = warn {
-                let mut rect_dsc: lv_draw_rect_dsc_t = Default::default();
-                lv_draw_rect_dsc_init(&mut rect_dsc);
-
-                rect_dsc.bg_opa = LV_OPA_20 as _;
-                rect_dsc.bg_color = lv_palette_main(lv_palette_t_LV_PALETTE_YELLOW);
-
-                lv_draw_rect(draw_part_dsc.draw_ctx, &rect_dsc, &warn_area);
-            };
-        };
+        }
     }
 }
 
@@ -323,26 +334,28 @@ pub fn update_trans_chart(value: i16) {
 }
 
 unsafe fn chart_range(chart: *mut lv_obj_t, ser: *mut lv_chart_series_t) -> (i16, i16) {
-    let points = lv_chart_get_y_array(chart, ser);
-    let oldest_idx = lv_chart_get_x_start_point(chart, ser) as usize;
+    unsafe {
+        let points = lv_chart_get_y_array(chart, ser);
+        let oldest_idx = lv_chart_get_x_start_point(chart, ser) as usize;
 
-    let oldest_value = *(points.add(oldest_idx));
-    let newest_value = *(points.add(if oldest_idx == 0 { 24 } else { oldest_idx - 1 }));
+        let oldest_value = *(points.add(oldest_idx));
+        let newest_value = *(points.add(if oldest_idx == 0 { 24 } else { oldest_idx - 1 }));
 
-    let min_max = if oldest_value < newest_value {
-        (oldest_value, newest_value)
-    } else {
-        (newest_value, oldest_value)
-    };
+        let min_max = if oldest_value < newest_value {
+            (oldest_value, newest_value)
+        } else {
+            (newest_value, oldest_value)
+        };
 
-    // Range total n Ticks, 4 gaps, 6 minor per gap, 5 major - one tick mark per unit in range
-    // If we are out of range make sure the points are still shown
-    let margin = 0.max((TICK_COUNT + 1) - (min_max.1 - min_max.0 + 1));
-    let top_margin = if margin % 2 == 0 {
-        margin / 2
-    } else {
-        margin / 2 + 1
-    };
+        // Range total n Ticks, 4 gaps, 6 minor per gap, 5 major - one tick mark per unit in range
+        // If we are out of range make sure the points are still shown
+        let margin = 0.max((TICK_COUNT + 1) - (min_max.1 - min_max.0 + 1));
+        let top_margin = if margin % 2 == 0 {
+            margin / 2
+        } else {
+            margin / 2 + 1
+        };
 
-    (min_max.0 - (margin - top_margin), min_max.1 + top_margin)
+        (min_max.0 - (margin - top_margin), min_max.1 + top_margin)
+    }
 }

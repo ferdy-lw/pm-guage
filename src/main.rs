@@ -135,7 +135,7 @@ fn main() -> anyhow::Result<()> {
 fn start_wifi_ap(wifi: &mut BlockingWifi<EspWifi<'_>>) -> anyhow::Result<()> {
     let wifi_configuration = Configuration::AccessPoint(AccessPointConfiguration {
         ssid: SSID.try_into().unwrap(),
-        ssid_hidden: false,
+        ssid_hidden: true,
         // auth_method: AuthMethod::WPA2Personal,
         auth_method: AuthMethod::None,
         password: PASSWORD.try_into().unwrap(),

@@ -133,7 +133,6 @@
                   "type": "tabset",
                   "id": "#7239e6c0-fd63-4347-831c-d4e811d0d6cc",
                   "weight": 0.44705882352941173,
-                  "selected": 1,
                   "enableClose": false,
                   "children": [
                     {
@@ -200,6 +199,7 @@
               "type": "tabset",
               "id": "EDITORS",
               "weight": 65,
+              "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
@@ -248,45 +248,31 @@
                   },
                   "icon": "svg:page"
                 }
-              ],
-              "active": true
+              ]
             },
             {
-              "type": "row",
-              "id": "#9f12fe59-e1bc-4ca3-8849-2eceab30c393",
+              "type": "tabset",
+              "id": "#6b11dce2-22f2-40c1-92e2-9eb1352dc416",
               "weight": 20,
               "children": [
                 {
-                  "type": "tabset",
-                  "id": "#49e6b222-b616-47f9-8dbd-dcdb9e81b055",
-                  "weight": 1.576072821846554,
-                  "children": [
-                    {
-                      "type": "tab",
-                      "id": "PROPERTIES",
-                      "name": "Properties",
-                      "component": "propertiesPanel",
-                      "enableClose": false,
-                      "icon": "svg:properties"
-                    }
-                  ]
+                  "type": "tab",
+                  "id": "PROPERTIES",
+                  "name": "Properties",
+                  "component": "propertiesPanel",
+                  "enableClose": false,
+                  "icon": "svg:properties"
                 },
                 {
-                  "type": "tabset",
-                  "id": "#b7bc3e25-e90b-429a-97fb-dc6eb8d65822",
-                  "weight": 1.423927178153446,
-                  "children": [
-                    {
-                      "type": "tab",
-                      "id": "COMPONENTS_PALETTE",
-                      "name": "Components Palette",
-                      "component": "componentsPalette",
-                      "enableClose": false,
-                      "icon": "svg:components"
-                    }
-                  ]
+                  "type": "tab",
+                  "id": "COMPONENTS_PALETTE",
+                  "name": "Components Palette",
+                  "component": "componentsPalette",
+                  "enableClose": false,
+                  "icon": "svg:components"
                 }
-              ]
+              ],
+              "active": true
             }
           ]
         }
@@ -1060,7 +1046,7 @@
       "transform": {
         "translate": {
           "x": -288.10691593715114,
-          "y": 69.21097063337061
+          "y": -410.7890293666294
         },
         "scale": 1
       },

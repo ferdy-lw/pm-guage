@@ -1,12 +1,18 @@
-use std::sync::atomic::Ordering;
+use std::{
+    ffi::CString,
+    sync::{
+        atomic::{AtomicU16, AtomicU8, Ordering},
+        Mutex,
+    },
+};
 
 use anyhow::Result;
 use circular_buffer::CircularBuffer;
 use log::info;
 
 use crate::ui::{
-    update_trans_chart, AVG_CONS, COOLANT_TEMP, ENGINE_TEMP, FUEL_LEVEL, OIL_PRESS, TRANS_TEMP,
-    VEHICLE_SPEED, VOLTAGE,
+    update_trans_chart, AVG_CONS, COOLANT_TEMP, ENGINE_TEMP, FUEL_LEVEL, OIL_PRESS, STATUS,
+    TRANS_TEMP, VOLTAGE,
 };
 
 pub type Formula = Box<dyn FnMut(&[u8]) -> Result<f32> + Sync + Send + 'static>;
@@ -28,6 +34,13 @@ impl std::fmt::Debug for OBDCommand {
             .finish()
     }
 }
+
+static _VEHICLE_SPEED: AtomicU8 = AtomicU8::new(0);
+static RPM: AtomicU16 = AtomicU16::new(0);
+static FUEL_USED: Mutex<f32> = Mutex::new(0.0);
+
+const CC_PER_MS: f32 = 285.0 / 60_000.0;
+const GAL_PER_CC: f32 = 0.000_264_172;
 
 impl OBDCommand {
     pub fn oil() -> Self {
@@ -91,22 +104,37 @@ impl OBDCommand {
         }
     }
 
-    pub fn vehicle_speed() -> Self {
+    pub fn _vehicle_speed() -> Self {
         OBDCommand {
             name: "Vehicle Speed".to_owned(),
             _short_name: "SPD".to_owned(),
             service: Vec::from(b"010D"),
             set_ui: Box::new(|data| {
-                let value = vehicle_speed(data)?;
+                let value = _vehicle_speed(data)?;
 
-                VEHICLE_SPEED.store(value, Ordering::Relaxed);
+                _VEHICLE_SPEED.store(value, Ordering::Relaxed);
 
                 Ok(value as f32)
             }),
         }
     }
 
-    pub fn avg_cons() -> Self {
+    pub fn engine_speed() -> Self {
+        OBDCommand {
+            name: "Engine Speed".to_owned(),
+            _short_name: "RPM".to_owned(),
+            service: Vec::from(b"2201D5"),
+            set_ui: Box::new(|data| {
+                let value = rpm(data)?;
+
+                RPM.store(value, Ordering::Relaxed);
+
+                Ok(value as f32)
+            }),
+        }
+    }
+
+    pub fn _avg_cons() -> Self {
         let mut context = Box::new(CircularBuffer::<60, u16>::new());
 
         OBDCommand {
@@ -114,43 +142,199 @@ impl OBDCommand {
             _short_name: "CONS".to_owned(),
             service: Vec::from(b"2201CA"), // MAF g/s
             set_ui: Box::new(move |data| {
-                let maf = maf(data)?;
+                let maf = _maf(data)?;
 
                 if maf.is_normal() {
-                    let speed = VEHICLE_SPEED.load(Ordering::Relaxed) as f32;
+                    let speed = _VEHICLE_SPEED.load(Ordering::Relaxed) as f32;
 
-                    if speed > 0.0 {
+                    if speed.is_normal() {
                         // info!("MAF ({maf}) speed ({speed})");
 
                         // let inst_cons_mpg = speed * 7.718 / maf; // assuming speed is in kph
                         let inst_cons_mpg = speed * 7.1073357 / maf; // assuming speed is in kph
+                        let inst_cons_mpg = (inst_cons_mpg * 10.0).trunc() * 0.1;
 
-                        let now_mpg = 99.9f32.min(inst_cons_mpg); // Don't exceed 99.9 mpg
+                        if inst_cons_mpg.is_normal() {
+                            let now_mpg = 99.9_f32.min(inst_cons_mpg); // Don't exceed 99.9 mpg
 
-                        // oldest will be 0 if the buffer is not yet full
-                        let oldest_mpg =
-                            context.push_back((now_mpg * 10.0) as u16).unwrap_or(0) as f32 * 0.1;
+                            let oldest_mpg = context.push_back((now_mpg * 10.0) as u16);
 
-                        let cons_prev = AVG_CONS.load(Ordering::Relaxed) as f32 * 0.1;
+                            let cons_prev = AVG_CONS.load(Ordering::Acquire) as f32 * 0.1;
 
-                        let cons_now = if oldest_mpg == 0.0 {
-                            // CA
-                            let n = context.len() as f32;
+                            let cons_now = if oldest_mpg.is_none() {
+                                // CA
+                                let n = context.len() as f32;
 
-                            (now_mpg + (n - 1.0) * cons_prev) / n
-                        } else {
-                            // SMA
-                            cons_prev + ((now_mpg - oldest_mpg) / context.len() as f32)
-                        };
+                                cons_prev + ((now_mpg - cons_prev) / n)
+                                // (now_mpg + (n - 1.0) * cons_prev) / n
+                            } else {
+                                // SMA
+                                let oldest_mpg = oldest_mpg.unwrap_or(0) as f32 * 0.1;
+                                cons_prev + ((now_mpg - oldest_mpg) / context.len() as f32)
+                            };
 
-                        // 18.3 mpg -> 183
-                        AVG_CONS.store((cons_now * 10.0) as u16, Ordering::Relaxed);
+                            // 18.3 mpg -> 183
+                            AVG_CONS.store((cons_now * 10.0) as u16, Ordering::Release);
 
-                        info!("speed ({speed}), maf ({maf}), inst_cons_mpg ({inst_cons_mpg}), inst_mpg ({now_mpg}), oldest ({oldest_mpg}), cons_prev ({cons_prev}), cons_now ({cons_now}), len ({})", context.len());
+                            let log_msg = format!("speed ({speed}), maf ({maf}), inst_cons_mpg ({inst_cons_mpg}), inst_mpg ({now_mpg}), oldest ({oldest_mpg:?}), cons_prev ({cons_prev}), cons_now ({cons_now}), len ({})", context.len());
+                            STATUS
+                                .write()
+                                .unwrap()
+                                .replace(CString::new(log_msg.as_str()).unwrap());
+
+                            //info!("speed ({speed}), maf ({maf}), inst_cons_mpg ({inst_cons_mpg}), inst_mpg ({now_mpg}), oldest ({oldest_mpg:?}), cons_prev ({cons_prev}), cons_now ({cons_now}), len ({})", context.len());
+                            info!("{log_msg}");
+                        }
                     }
                 }
 
                 Ok(maf as f32)
+            }),
+        }
+    }
+
+    pub fn _fuel_cons() -> Self {
+        // Miles, Fuel level
+        let mut context = (None, None);
+
+        OBDCommand {
+            name: "Fuel Consumption".to_owned(),
+            _short_name: "FCON".to_owned(),
+            service: Vec::from(b"2214FA"), // Distance list last trip oil change (total km)
+            set_ui: Box::new(move |data| {
+                let mut cons: f32 = 0.0;
+
+                let miles_now = miles_driven(data)?;
+
+                let fuel_now = FUEL_LEVEL.load(Ordering::Relaxed) as f32 * 0.1;
+
+                match context {
+                    (None, None) => {
+                        if fuel_now > 0.0 {
+                            context = (None, Some(fuel_now));
+                        }
+                    }
+                    (None, Some(fuel_prev)) => {
+                        if fuel_prev < fuel_now {
+                            context = (None, Some(fuel_now));
+                        } else if fuel_prev > fuel_now {
+                            context = (Some(miles_now), Some(fuel_now));
+                        }
+                    }
+                    (Some(miles_prev), Some(fuel_prev)) => {
+                        if fuel_prev < fuel_now {
+                            context = (None, Some(fuel_now));
+                        } else if fuel_prev > fuel_now {
+                            cons = (miles_now - miles_prev) / (fuel_prev - fuel_now);
+
+                            cons = 99.9_f32.min(cons);
+
+                            let log_msg = format!("miles now ({miles_now}) prev ({miles_prev}), fuel prev ({fuel_prev}) now ({fuel_now}), cons_now ({cons})");
+                            STATUS
+                                .write()
+                                .unwrap()
+                                .replace(CString::new(log_msg.as_str()).unwrap());
+
+                            info!("{log_msg}");
+
+                            // 18.3 mpg -> 183
+                            AVG_CONS.store((cons * 10.0) as u16, Ordering::Relaxed);
+
+                            context = (Some(miles_now), Some(fuel_now));
+                        }
+                    }
+                    _ => {}
+                }
+
+                Ok(cons)
+            }),
+        }
+    }
+
+    pub fn _maf() -> Self {
+        OBDCommand {
+            name: "MAF".to_owned(),
+            _short_name: "MAF".to_owned(),
+            service: Vec::from(b"2201CA"), // MAF g/s
+            set_ui: Box::new(|data| {
+                let maf = _maf(data)?;
+
+                if maf.is_normal() {
+                    // gallons of fuel = (grams of air) / (air/fuel ratio) / 6.17 (pounds per gallon) / 464 (grams per pound)
+                    let gallons = maf / 14.7 / 6.1 / 464.0;
+
+                    *FUEL_USED.lock().unwrap() += gallons;
+                }
+
+                Ok(maf)
+            }),
+        }
+    }
+
+    pub fn fuel_cons() -> Self {
+        // Odometer
+        let mut context = None;
+
+        OBDCommand {
+            name: "Fuel Consumption".to_owned(),
+            _short_name: "FCON".to_owned(),
+            service: Vec::from(b"2214FA"), // Distance list last trip oil change (total km)
+            set_ui: Box::new(move |data| {
+                let mut cons: f32 = 0.0;
+
+                let miles_now = miles_driven(data)?;
+
+                if let Some(miles_prev) = context {
+                    let fuel_used = *FUEL_USED.lock().unwrap();
+
+                    if fuel_used > 0.0 {
+                        // gallons of fuel per sec = (total pulse widths in ms per sec) * (injector cc per ms) * (num cyl) * (gal per cc)
+                        let fuel_used = fuel_used * CC_PER_MS * 6.0 * GAL_PER_CC;
+
+                        // derate the mpg to closer match actual
+                        cons = (miles_now - miles_prev) / fuel_used * 0.5;
+
+                        cons = 99.9_f32.min(cons);
+
+                        let log_msg = format!("miles now ({miles_now}) prev ({miles_prev}), fuel used ({fuel_used}), cons_now ({cons})");
+                        STATUS
+                            .write()
+                            .unwrap()
+                            .replace(CString::new(log_msg.as_str()).unwrap());
+
+                        info!("{log_msg}");
+
+                        // 18.3 mpg -> 183
+                        AVG_CONS.store((cons * 10.0) as u16, Ordering::Relaxed);
+                    }
+                }
+
+                *FUEL_USED.lock().unwrap() = 0.0;
+                context = Some(miles_now);
+
+                Ok(cons)
+            }),
+        }
+    }
+
+    pub fn ipw_1() -> Self {
+        OBDCommand {
+            name: "Injector 1 pulse width".to_owned(),
+            _short_name: "IPW1".to_owned(),
+            service: Vec::from(b"220234"),
+            set_ui: Box::new(|data| {
+                let ipw = injector_pulse_width(data)?;
+
+                if ipw.is_normal() {
+                    let rpm = RPM.load(Ordering::Relaxed) as f32;
+
+                    // gallons of fuel per sec = (pulse width in ms per sec) * (rev per sec)
+                    let gallons = ipw * (rpm * 0.016_667);
+
+                    *FUEL_USED.lock().unwrap() += gallons;
+                }
+
+                Ok(ipw)
             }),
         }
     }
@@ -162,6 +346,7 @@ impl OBDCommand {
             // service: Vec::from(b"012F"),
             service: Vec::from(b"220227"),
             set_ui: Box::new(|data| {
+                // 8.3 -> 83
                 let value = (fuel_level(data)? * 10.0) as u16;
 
                 FUEL_LEVEL.store(value, Ordering::Relaxed);
@@ -238,6 +423,10 @@ const fn combine(a: f32, b: f32) -> f32 {
     a * 256.0 + b
 }
 
+const fn combine_3(b: f32, c: f32, d: f32) -> f32 {
+    b * 65536.0 + combine(c, d)
+}
+
 const fn c_to_f(c: f32) -> f32 {
     c * 1.8 + 32.0
 }
@@ -250,8 +439,12 @@ fn two_digits(v: f32) -> f32 {
     f32::trunc(v * 100.0) * 0.01
 }
 
-fn _rpm(data: &[u8]) -> Result<f32> {
-    Ok((data[0] as f32 * 256f32 + data[1] as f32) / 4.0)
+/// RPM
+fn rpm(data: &[u8]) -> Result<u16> {
+    let a = *data.first().unwrap_or(&0) as f32;
+    let b = *data.get(1).unwrap_or(&0) as f32;
+
+    Ok(combine(a, b) as u16)
 }
 
 /// COOLANT - F
@@ -290,7 +483,7 @@ fn engine_temp(data: &[u8]) -> Result<f32> {
 }
 
 /// SPEED - kph
-fn vehicle_speed(data: &[u8]) -> Result<u8> {
+fn _vehicle_speed(data: &[u8]) -> Result<u8> {
     Ok(*data.first().unwrap_or(&0)) // kph
 }
 
@@ -302,12 +495,21 @@ fn _fuel_rate(data: &[u8]) -> Result<f32> {
     Ok(f32::trunc(ans * 100.0f32) / 100.0f32)
 }
 
-/// MAF - g/s
-fn maf(data: &[u8]) -> Result<f32> {
+/// IPW - ms
+fn injector_pulse_width(data: &[u8]) -> Result<f32> {
     let c = *data.get(2).unwrap_or(&0) as f32;
     let d = *data.get(3).unwrap_or(&0) as f32;
 
-    let ans = combine(c, d) * 0.000_977_021_2;
+    Ok(combine(c, d) * 0.001)
+}
+
+/// MAF - g/s
+fn _maf(data: &[u8]) -> Result<f32> {
+    let c = *data.get(2).unwrap_or(&0) as f32;
+    let d = *data.get(3).unwrap_or(&0) as f32;
+
+    // let ans = combine(c, d) * 0.000_977_021_2;
+    let ans = combine(c, d) * 0.001;
 
     Ok(ans)
 }
@@ -321,6 +523,17 @@ fn fuel_level(data: &[u8]) -> Result<f32> {
     // 24 gal tank
     // let ans = a - 100.0; // PCT remaining
     let ans = 24.0 * ((a - 100.0) * 0.01);
+
+    Ok(two_digits(ans))
+}
+
+fn miles_driven(data: &[u8]) -> Result<f32> {
+    let b = *data.get(1).unwrap_or(&0) as f32;
+    let c = *data.get(2).unwrap_or(&0) as f32;
+    let d = *data.get(3).unwrap_or(&0) as f32;
+
+    // km to miles
+    let ans = (combine_3(b, c, d) * 0.1) * 0.621371;
 
     Ok(two_digits(ans))
 }
