@@ -1,1 +1,2 @@
-podman exec -ti zed-pm espflash flash --monitor --partition-table pm-guage/partitions.csv --erase-parts otadata --bootloader pm-guage/target/xtensa-esp32s3-espidf/debug/bootloader.bin pm-guage/target/xtensa-esp32s3-espidf/debug/pm-guage
+#podman exec -ti zed-pm espflash flash --monitor --partition-table pm-guage/partitions.csv --erase-parts otadata --bootloader pm-guage/target/xtensa-esp32s3-espidf/debug/bootloader.bin pm-guage/target/xtensa-esp32s3-espidf/debug/pm-guage
+podman exec -ti zed-pm espflash flash --monitor pm-guage/target/xtensa-esp32s3-espidf/debug/pm-guage

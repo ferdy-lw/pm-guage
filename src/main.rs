@@ -5,7 +5,7 @@ use std::{sync::mpsc, thread, time::Duration};
 use esp_idf_svc::{
     espnow::EspNow,
     eventloop::EspSystemEventLoop,
-    hal::peripherals::Peripherals,
+    hal::prelude::Peripherals,
     netif::IpEvent,
     nvs::EspDefaultNvsPartition,
     sys::lcd_bindings::{
@@ -28,8 +28,6 @@ use crate::ui::update_trans_chart;
 type MacAddr = [u8; 6];
 const SSID: &str = "OBD-ESPWIFI";
 const PASSWORD: &str = "123456789";
-
-esp_idf_svc::sys::esp_app_desc!();
 
 fn main() -> anyhow::Result<()> {
     esp_idf_svc::sys::link_patches();
