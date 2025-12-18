@@ -1,0 +1,35 @@
+[
+    {
+        "label": "Debug ESP",
+        "adapter": "probe-rs",
+        "request": "launch",
+        "cwd": "$ZED_WORKTREE_ROOT",
+        "server": "127.0.0.1:50000",
+        "chip": "esp32s3",
+        // "speed": 500,
+        // "probe": {"product_id": "303a", "vendor_id": 0,
+        "consoleLogLevel": "Debug", // Console, Info, Debug
+        "flashingConfig": {
+            "flashingEnabled": true,
+            "haltAfterReset": true,
+            "fullChipErase": false, // Ensure clean state
+            "formatOptions": {
+                "binary_format": "Idf"
+            },
+            "verifyAfterFlashing": true
+        },
+        "wireProtocol": "Jtag",
+
+        "coreConfigs": [
+            {
+                "coreIndex": 0,
+                "programBinary": "target/xtensa-esp32s3-espidf/debug/pm-guage",
+                "svdFile": "esp32s3.svd"
+            }
+            //     "coreIndex": 1,
+            //     "programBinary": "target/xtensa-esp32s3-espidf/debug/pm-guage",
+            //     "svdFile": "esp32s3.svd"
+            // }
+        ]
+    }
+]
