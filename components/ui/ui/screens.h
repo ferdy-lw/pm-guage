@@ -29,16 +29,17 @@ typedef struct _objects_t {
     lv_obj_t *trans_chart;
     lv_obj_t *fuel_cons;
     lv_obj_t *cons;
-    lv_obj_t *cons_ico;
+    lv_obj_t *obj8;
     lv_obj_t *cons_whole;
     lv_obj_t *cons_frac;
-    lv_obj_t *obj8;
+    lv_obj_t *obj9;
     lv_obj_t *fuel;
+    lv_obj_t *fuel_ico;
     lv_obj_t *fuel_whole;
     lv_obj_t *fuel_frac;
-    lv_obj_t *obj9;
     lv_obj_t *obj10;
     lv_obj_t *obj11;
+    lv_obj_t *obj12;
     lv_obj_t *status_text;
 } objects_t;
 

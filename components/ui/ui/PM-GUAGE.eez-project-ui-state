@@ -3,7 +3,9 @@
     "selectedUserPageObject": "[PM-GUAGE.eez-project]:/userPages/0",
     "selectedActionObject": "[PM-GUAGE.eez-project]:/actions/0",
     "selectedGlobalVariableObject": "[PM-GUAGE.eez-project]:/variables/globalVariables/7",
-    "selectedStyleObject": "[PM-GUAGE.eez-project]:/lvglStyles/styles/4",
+    "selectedStyleObject": "[PM-GUAGE.eez-project]:/lvglStyles/styles/0",
+    "selectedFontObject": "[PM-GUAGE.eez-project]:/fonts/-1",
+    "selectedBitmapObject": "[PM-GUAGE.eez-project]:/bitmaps/1",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
     }
@@ -26,7 +28,8 @@
           },
           {
             "type": "border",
-            "size": 240,
+            "selected": 1,
+            "size": 180.5,
             "location": "right",
             "children": [
               {
@@ -81,6 +84,7 @@
           },
           {
             "type": "border",
+            "size": 173.8125,
             "location": "bottom",
             "children": [
               {
@@ -198,7 +202,7 @@
             {
               "type": "tabset",
               "id": "EDITORS",
-              "weight": 65,
+              "weight": 67.00970873786407,
               "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
@@ -253,7 +257,7 @@
             {
               "type": "tabset",
               "id": "#6b11dce2-22f2-40c1-92e2-9eb1352dc416",
-              "weight": 20,
+              "weight": 17.990291262135923,
               "children": [
                 {
                   "type": "tab",
@@ -588,7 +592,8 @@
                       "component": "bitmaps",
                       "enableClose": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1031,22 +1036,24 @@
           "0": {
             "2": {}
           },
-          "1": {
-            "$selected": true
-          },
+          "1": {},
           "2": {},
           "3": {},
           "4": {},
           "6": {
-            "0": {},
-            "1": {}
+            "0": {
+              "1": {}
+            },
+            "1": {
+              "1": {}
+            }
           }
         }
       },
       "transform": {
         "translate": {
-          "x": -288.10691593715114,
-          "y": -410.7890293666294
+          "x": -512,
+          "y": -180
         },
         "scale": 1
       },
@@ -1058,16 +1065,18 @@
       }
     },
     "[PM-GUAGE.eez-project]:/lvglStyles/styles[tree-state]": {
-      "0": {},
+      "0": {
+        "$selected": true
+      },
       "1": {},
       "2": {},
       "3": {},
-      "4": {
-        "$selected": true
-      },
+      "4": {},
       "5": {},
       "6": {},
-      "7": {}
+      "7": {},
+      "8": {},
+      "9": {}
     },
     "[PM-GUAGE.eez-project]:/userPages/1[flow-state]": {
       "selection": {
@@ -1134,17 +1143,9 @@
   "lvglPart": "MAIN",
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
-    "BORDER",
-    "PADDING",
-    "BACKGROUND",
-    "TEXT",
     "MISCELLANEOUS",
-    "LAYOUT",
-    "POSITION AND SIZE",
-    "LINE",
-    "ARC",
-    "OUTLINE",
-    "SHADOW"
+    "TEXT",
+    "IMAGE"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,

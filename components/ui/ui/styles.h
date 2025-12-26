@@ -37,6 +37,26 @@ lv_style_t *get_style_low_fuel_meter_MAIN_DEFAULT();
 void add_style_low_fuel_meter(lv_obj_t *obj);
 void remove_style_low_fuel_meter(lv_obj_t *obj);
 
+// Style: guage_num
+lv_style_t *get_style_guage_num_MAIN_DEFAULT();
+void add_style_guage_num(lv_obj_t *obj);
+void remove_style_guage_num(lv_obj_t *obj);
+
+// Style: meter_num
+lv_style_t *get_style_meter_num_TICKS_DEFAULT();
+void add_style_meter_num(lv_obj_t *obj);
+void remove_style_meter_num(lv_obj_t *obj);
+
+// Style: low_fuel_ico
+lv_style_t *get_style_low_fuel_ico_MAIN_DEFAULT();
+void add_style_low_fuel_ico(lv_obj_t *obj);
+void remove_style_low_fuel_ico(lv_obj_t *obj);
+
+// Style: fuel_ico
+lv_style_t *get_style_fuel_ico_MAIN_DEFAULT();
+void add_style_fuel_ico(lv_obj_t *obj);
+void remove_style_fuel_ico(lv_obj_t *obj);
+
 
 
 #ifdef __cplusplus

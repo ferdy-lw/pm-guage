@@ -193,6 +193,121 @@ void remove_style_low_fuel_meter(lv_obj_t *obj) {
 };
 
 //
+// Style: guage_num
+//
+
+void init_style_guage_num_MAIN_DEFAULT(lv_style_t *style) {
+    lv_style_set_pad_top(style, 5);
+    lv_style_set_text_font(style, &ui_font_robo_med_44);
+};
+
+lv_style_t *get_style_guage_num_MAIN_DEFAULT() {
+    static lv_style_t *style;
+    if (!style) {
+        style = lv_mem_alloc(sizeof(lv_style_t));
+        lv_style_init(style);
+        init_style_guage_num_MAIN_DEFAULT(style);
+    }
+    return style;
+};
+
+void add_style_guage_num(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_add_style(obj, get_style_guage_num_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+void remove_style_guage_num(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_remove_style(obj, get_style_guage_num_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+//
+// Style: meter_num
+//
+
+void init_style_meter_num_TICKS_DEFAULT(lv_style_t *style) {
+    lv_style_set_text_font(style, &ui_font_robo_reg_14);
+};
+
+lv_style_t *get_style_meter_num_TICKS_DEFAULT() {
+    static lv_style_t *style;
+    if (!style) {
+        style = lv_mem_alloc(sizeof(lv_style_t));
+        lv_style_init(style);
+        init_style_meter_num_TICKS_DEFAULT(style);
+    }
+    return style;
+};
+
+void add_style_meter_num(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_add_style(obj, get_style_meter_num_TICKS_DEFAULT(), LV_PART_TICKS | LV_STATE_DEFAULT);
+};
+
+void remove_style_meter_num(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_remove_style(obj, get_style_meter_num_TICKS_DEFAULT(), LV_PART_TICKS | LV_STATE_DEFAULT);
+};
+
+//
+// Style: low_fuel_ico
+//
+
+void init_style_low_fuel_ico_MAIN_DEFAULT(lv_style_t *style) {
+    lv_style_set_img_recolor(style, lv_color_hex(0xffff0000));
+    lv_style_set_img_recolor_opa(style, 255);
+};
+
+lv_style_t *get_style_low_fuel_ico_MAIN_DEFAULT() {
+    static lv_style_t *style;
+    if (!style) {
+        style = lv_mem_alloc(sizeof(lv_style_t));
+        lv_style_init(style);
+        init_style_low_fuel_ico_MAIN_DEFAULT(style);
+    }
+    return style;
+};
+
+void add_style_low_fuel_ico(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_add_style(obj, get_style_low_fuel_ico_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+void remove_style_low_fuel_ico(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_remove_style(obj, get_style_low_fuel_ico_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+//
+// Style: fuel_ico
+//
+
+void init_style_fuel_ico_MAIN_DEFAULT(lv_style_t *style) {
+    lv_style_set_img_recolor_opa(style, 255);
+    lv_style_set_img_recolor(style, lv_color_hex(0xff5bf181));
+};
+
+lv_style_t *get_style_fuel_ico_MAIN_DEFAULT() {
+    static lv_style_t *style;
+    if (!style) {
+        style = lv_mem_alloc(sizeof(lv_style_t));
+        lv_style_init(style);
+        init_style_fuel_ico_MAIN_DEFAULT(style);
+    }
+    return style;
+};
+
+void add_style_fuel_ico(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_add_style(obj, get_style_fuel_ico_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+void remove_style_fuel_ico(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_remove_style(obj, get_style_fuel_ico_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+//
 //
 //
 
@@ -205,6 +320,10 @@ void add_style(lv_obj_t *obj, int32_t styleIndex) {
         add_style_hot_temp,
         add_style_low_fuel,
         add_style_low_fuel_meter,
+        add_style_guage_num,
+        add_style_meter_num,
+        add_style_low_fuel_ico,
+        add_style_fuel_ico,
     };
     add_style_funcs[styleIndex](obj);
 }
@@ -218,6 +337,10 @@ void remove_style(lv_obj_t *obj, int32_t styleIndex) {
         remove_style_hot_temp,
         remove_style_low_fuel,
         remove_style_low_fuel_meter,
+        remove_style_guage_num,
+        remove_style_meter_num,
+        remove_style_low_fuel_ico,
+        remove_style_fuel_ico,
     };
     remove_style_funcs[styleIndex](obj);
 }
