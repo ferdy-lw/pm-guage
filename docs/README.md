@@ -1,6 +1,6 @@
 # Promaster OBD monitoring
 
-![](pm_gauge_close.jpg)
+![](pm_gauge_large.jpg)
  
 Similar to scangauge, monitor coolant, engine, and transmission temperatures as well as oil pressure,
 voltage, remaining fuel, and a rolling mpg over 5 minutes.
