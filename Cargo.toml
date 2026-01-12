@@ -1,5 +1,5 @@
 [package]
-name = "pm-guage"
+name = "pm-gauge"
 version = "0.1.0"
 authors = ["ferdy"]
 edition = "2024"
@@ -7,7 +7,7 @@ resolver = "2"
 rust-version = "1.88"
 
 [[bin]]
-name = "pm-guage"
+name = "pm-gauge"
 harness = false # do not use the built in cargo test harness -> resolve rust-analyzer errors
 
 [profile.release]

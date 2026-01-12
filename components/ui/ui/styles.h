@@ -27,6 +27,11 @@ lv_style_t *get_style_hot_temp_MAIN_DEFAULT();
 void add_style_hot_temp(lv_obj_t *obj);
 void remove_style_hot_temp(lv_obj_t *obj);
 
+// Style: gauge_num
+lv_style_t *get_style_gauge_num_MAIN_DEFAULT();
+void add_style_gauge_num(lv_obj_t *obj);
+void remove_style_gauge_num(lv_obj_t *obj);
+
 // Style: low_fuel
 lv_style_t *get_style_low_fuel_MAIN_DEFAULT();
 void add_style_low_fuel(lv_obj_t *obj);
@@ -36,11 +41,6 @@ void remove_style_low_fuel(lv_obj_t *obj);
 lv_style_t *get_style_low_fuel_meter_MAIN_DEFAULT();
 void add_style_low_fuel_meter(lv_obj_t *obj);
 void remove_style_low_fuel_meter(lv_obj_t *obj);
-
-// Style: guage_num
-lv_style_t *get_style_guage_num_MAIN_DEFAULT();
-void add_style_guage_num(lv_obj_t *obj);
-void remove_style_guage_num(lv_obj_t *obj);
 
 // Style: meter_num
 lv_style_t *get_style_meter_num_TICKS_DEFAULT();

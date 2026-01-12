@@ -1,10 +1,10 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[PM-GUAGE.eez-project]:/userPages/0",
-    "selectedActionObject": "[PM-GUAGE.eez-project]:/actions/0",
-    "selectedGlobalVariableObject": "[PM-GUAGE.eez-project]:/variables/globalVariables/7",
-    "selectedStyleObject": "[PM-GUAGE.eez-project]:/lvglStyles/styles/0",
-    "selectedBitmapObject": "[PM-GUAGE.eez-project]:/bitmaps/1",
+    "selectedUserPageObject": "[PM-GAUGE.eez-project]:/userPages/0",
+    "selectedActionObject": "[PM-GAUGE.eez-project]:/actions/0",
+    "selectedGlobalVariableObject": "[PM-GAUGE.eez-project]:/variables/globalVariables/7",
+    "selectedStyleObject": "[PM-GAUGE.eez-project]:/lvglStyles/styles/0",
+    "selectedBitmapObject": "[PM-GAUGE.eez-project]:/bitmaps/1",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
     }
@@ -212,8 +212,8 @@
                   "name": "Settings",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[PM-GUAGE.eez-project]:/settings",
-                    "subObjectPath": "[PM-GUAGE.eez-project]:/settings",
+                    "objectPath": "[PM-GAUGE.eez-project]:/settings",
+                    "subObjectPath": "[PM-GAUGE.eez-project]:/settings",
                     "permanent": false
                   },
                   "icon": "material:settings"
@@ -224,7 +224,7 @@
                   "name": "Temps",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[PM-GUAGE.eez-project]:/userPages/0",
+                    "objectPath": "[PM-GAUGE.eez-project]:/userPages/0",
                     "permanent": true
                   },
                   "icon": "svg:page"
@@ -235,7 +235,7 @@
                   "name": "trunc_value",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[PM-GUAGE.eez-project]:/actions/0",
+                    "objectPath": "[PM-GAUGE.eez-project]:/actions/0",
                     "permanent": false
                   },
                   "icon": "material:code"
@@ -246,7 +246,7 @@
                   "name": "Status",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[PM-GUAGE.eez-project]:/userPages/1",
+                    "objectPath": "[PM-GAUGE.eez-project]:/userPages/1",
                     "permanent": true
                   },
                   "icon": "svg:page"
@@ -488,7 +488,7 @@
                   "name": "trunc_value",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[PM-GUAGE.eez-project]:/actions/0",
+                    "objectPath": "[PM-GAUGE.eez-project]:/actions/0",
                     "permanent": false
                   },
                   "icon": "material:code"
@@ -499,7 +499,7 @@
                   "name": "Temps",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[PM-GUAGE.eez-project]:/userPages/0",
+                    "objectPath": "[PM-GAUGE.eez-project]:/userPages/0",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -1029,7 +1029,7 @@
   "selectedBuildConfiguration": "Default",
   "features": {},
   "objects": {
-    "[PM-GUAGE.eez-project]:/userPages/0[flow-state]": {
+    "[PM-GAUGE.eez-project]:/userPages/0[flow-state]": {
       "selection": {
         "0": {
           "0": {
@@ -1063,7 +1063,7 @@
         "scrollLeft": 0
       }
     },
-    "[PM-GUAGE.eez-project]:/lvglStyles/styles[tree-state]": {
+    "[PM-GAUGE.eez-project]:/lvglStyles/styles[tree-state]": {
       "0": {
         "$selected": true
       },
@@ -1077,7 +1077,7 @@
       "8": {},
       "9": {}
     },
-    "[PM-GUAGE.eez-project]:/userPages/1[flow-state]": {
+    "[PM-GAUGE.eez-project]:/userPages/1[flow-state]": {
       "selection": {
         "0": {
           "0": {
@@ -1100,7 +1100,7 @@
         "scrollLeft": 0
       }
     },
-    "[PM-GUAGE.eez-project]:/actions/0[flow-state]": {
+    "[PM-GAUGE.eez-project]:/actions/0[flow-state]": {
       "selection": {
         "1": {
           "$selected": true
@@ -1114,7 +1114,7 @@
         "scale": 1
       }
     },
-    "[PM-GUAGE.eez-project]:/actions/1[flow-state]": {
+    "[PM-GAUGE.eez-project]:/actions/1[flow-state]": {
       "selection": {
         "1": {}
       },

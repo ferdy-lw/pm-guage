@@ -194,7 +194,7 @@ void create_screen_temps() {
                     objects.trans_value = obj;
                     lv_obj_set_pos(obj, 112, 112);
                     lv_obj_set_size(obj, 100, 100);
-                    add_style_guage_num(obj);
+                    add_style_gauge_num(obj);
                     lv_obj_set_style_pad_top(obj, 31, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_outline_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_outline_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -247,7 +247,7 @@ void create_screen_temps() {
                     objects.obj4 = obj;
                     lv_obj_set_pos(obj, 68, 60);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_guage_num(obj);
+                    add_style_gauge_num(obj);
                     lv_obj_set_style_shadow_width(obj, 35, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_shadow_spread(obj, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_shadow_color(obj, lv_color_hex(0xffc2ebf8), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -293,7 +293,7 @@ void create_screen_temps() {
                     objects.obj5 = obj;
                     lv_obj_set_pos(obj, 37, 60);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_guage_num(obj);
+                    add_style_gauge_num(obj);
                     lv_obj_set_style_shadow_width(obj, 35, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_shadow_spread(obj, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_shadow_color(obj, lv_color_hex(0xfff6d9b3), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -355,7 +355,7 @@ void create_screen_temps() {
                     objects.coolant_value = obj;
                     lv_obj_set_pos(obj, 218, 158);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_guage_num(obj);
+                    add_style_gauge_num(obj);
                     lv_label_set_text(obj, "");
                 }
                 {
@@ -373,7 +373,7 @@ void create_screen_temps() {
                     objects.engine_value = obj;
                     lv_obj_set_pos(obj, 218, 208);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_guage_num(obj);
+                    add_style_gauge_num(obj);
                     lv_label_set_text(obj, "");
                 }
                 {
@@ -907,7 +907,7 @@ extern void remove_style(lv_obj_t *obj, int32_t styleIndex);
 
 static const char *screen_names[] = { "Temps", "Status" };
 static const char *object_names[] = { "temps", "status", "obj0", "obj1", "obj2", "info", "trans_meter", "obj3", "trans_value", "pressure", "obj4", "voltage", "obj5", "temp_meter", "coolant_value", "obj6", "engine_value", "obj7", "trans_chart", "fuel_cons", "cons", "obj8", "cons_whole", "cons_frac", "obj9", "fuel", "fuel_ico", "fuel_whole", "fuel_frac", "obj10", "obj11", "obj12", "status_text" };
-static const char *style_names[] = { "tab_panel", "tab_button", "tab_active", "hot_temp", "low_fuel", "low_fuel_meter", "guage_num", "meter_num", "low_fuel_ico", "fuel_ico" };
+static const char *style_names[] = { "tab_panel", "tab_button", "tab_active", "hot_temp", "gauge_num", "low_fuel", "low_fuel_meter", "meter_num", "low_fuel_ico", "fuel_ico" };
 
 
 typedef void (*tick_screen_func_t)();

@@ -804,7 +804,7 @@
                   "checkedStateType": "literal",
                   "disabledStateType": "literal",
                   "states": "",
-                  "useStyle": "guage_num",
+                  "useStyle": "gauge_num",
                   "localStyles": {
                     "objID": "46706fc4-db16-4db1-a4ee-b9d5b458cc59",
                     "definition": {
@@ -1059,7 +1059,7 @@
                   "checkedStateType": "literal",
                   "disabledStateType": "literal",
                   "states": "",
-                  "useStyle": "guage_num",
+                  "useStyle": "gauge_num",
                   "localStyles": {
                     "objID": "49a8ec36-1e6b-442f-e573-1324836451cc",
                     "definition": {
@@ -1222,7 +1222,7 @@
                   "checkedStateType": "literal",
                   "disabledStateType": "literal",
                   "states": "",
-                  "useStyle": "guage_num",
+                  "useStyle": "gauge_num",
                   "localStyles": {
                     "objID": "6175afe2-f80a-4c86-92f8-cfce062528a4",
                     "definition": {
@@ -1355,7 +1355,7 @@
                   "checkedStateType": "literal",
                   "disabledStateType": "literal",
                   "states": "",
-                  "useStyle": "guage_num",
+                  "useStyle": "gauge_num",
                   "localStyles": {
                     "objID": "cb7cef2f-b8d0-4760-a2ab-8a127a5461eb"
                   },
@@ -1457,7 +1457,7 @@
                   "checkedStateType": "literal",
                   "disabledStateType": "literal",
                   "states": "",
-                  "useStyle": "guage_num",
+                  "useStyle": "gauge_num",
                   "localStyles": {
                     "objID": "28888483-23c7-413d-d2f2-770a2a979b8e"
                   },
@@ -3557,6 +3557,23 @@
         }
       },
       {
+        "objID": "a82f22d6-dadd-4407-f199-d5aaeab1622c",
+        "name": "gauge_num",
+        "forWidgetType": "LVGLLabelWidget",
+        "childStyles": [],
+        "definition": {
+          "objID": "b3beb5a6-f29e-4ca0-8311-075212ddcf7d",
+          "definition": {
+            "MAIN": {
+              "DEFAULT": {
+                "pad_top": 5,
+                "text_font": "robo_med_44"
+              }
+            }
+          }
+        }
+      },
+      {
         "objID": "c2b574c8-82d5-487f-a711-f0e8c51e5dac",
         "name": "low_fuel",
         "forWidgetType": "LVGLLabelWidget",
@@ -3583,23 +3600,6 @@
             "MAIN": {
               "DEFAULT": {
                 "border_color": "#f00"
-              }
-            }
-          }
-        }
-      },
-      {
-        "objID": "67345a3a-b963-431e-eb50-5bcc7edcdfc8",
-        "name": "guage_num",
-        "forWidgetType": "LVGLLabelWidget",
-        "childStyles": [],
-        "definition": {
-          "objID": "cf188d69-3949-487b-a56d-fef077d8b186",
-          "definition": {
-            "MAIN": {
-              "DEFAULT": {
-                "pad_top": 5,
-                "text_font": "robo_med_44"
               }
             }
           }

@@ -1,8 +1,8 @@
 # Promaster OBD monitoring
 
-![](pm_guage_close.jpg)
+![](pm_gauge_close.jpg)
  
-Similar to scanguage, monitor coolant, engine, and transmission temperatures as well as oil pressure,
+Similar to scangauge, monitor coolant, engine, and transmission temperatures as well as oil pressure,
 voltage, remaining fuel, and a rolling mpg over 5 minutes.
 
 It runs on an esp32s3 [waveshare 5 inch touch lcd](https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-5) and 
@@ -29,6 +29,6 @@ The ui/lvgl C functions are simply called through unsafe blocks.
 
 ### Flash
 
-`espflash flash --monitor target/xtensa-esp32s3-espidf/debug/pm-guage`
+`espflash flash --monitor target/xtensa-esp32s3-espidf/debug/pm-gauge`
 
-![](pm_guage.jpg)
+![](pm_gauge.jpg)

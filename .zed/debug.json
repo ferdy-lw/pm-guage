@@ -23,11 +23,11 @@
         "coreConfigs": [
             {
                 "coreIndex": 0,
-                "programBinary": "target/xtensa-esp32s3-espidf/debug/pm-guage",
+                "programBinary": "target/xtensa-esp32s3-espidf/debug/pm-gauge",
                 "svdFile": "esp32s3.svd"
             }
             //     "coreIndex": 1,
-            //     "programBinary": "target/xtensa-esp32s3-espidf/debug/pm-guage",
+            //     "programBinary": "target/xtensa-esp32s3-espidf/debug/pm-gauge",
             //     "svdFile": "esp32s3.svd"
             // }
         ]
