@@ -4,7 +4,6 @@
     "selectedActionObject": "[PM-GUAGE.eez-project]:/actions/0",
     "selectedGlobalVariableObject": "[PM-GUAGE.eez-project]:/variables/globalVariables/7",
     "selectedStyleObject": "[PM-GUAGE.eez-project]:/lvglStyles/styles/0",
-    "selectedFontObject": "[PM-GUAGE.eez-project]:/fonts/-1",
     "selectedBitmapObject": "[PM-GUAGE.eez-project]:/bitmaps/1",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
@@ -252,7 +251,8 @@
                   },
                   "icon": "svg:page"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "tabset",
@@ -275,8 +275,7 @@
                   "enableClose": false,
                   "icon": "svg:components"
                 }
-              ],
-              "active": true
+              ]
             }
           ]
         }
@@ -1053,7 +1052,7 @@
       "transform": {
         "translate": {
           "x": -512,
-          "y": -180
+          "y": -420
         },
         "scale": 1
       },
