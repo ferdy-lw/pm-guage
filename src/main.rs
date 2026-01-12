@@ -100,21 +100,9 @@ fn main() -> anyhow::Result<()> {
         if lvgl_port_lock(-1) {
             log::info!("port lock");
 
-            // wavesahre_rgb_lcd_bl_off();
-            // log::info!("backlight off");
-            // let _timer = lv_timer_create(Some(timer_cb), 1000, ptr::null_mut());
-            // log::info!("Created timer");
-
-            // lv_demo_music();
-            // example_lvgl_demo_ui();
-            // log::info!("music finished");
             ui_init();
             create_trans_chart();
             log::info!("ui init...");
-
-            // thread::sleep(Duration::from_millis(500));
-            // wavesahre_rgb_lcd_bl_on();
-            // log::info!("backlight off");
 
             lvgl_port_unlock();
         }
@@ -151,15 +139,13 @@ fn start_wifi_ap(wifi: &mut BlockingWifi<EspWifi<'_>>) -> anyhow::Result<()> {
     wifi.start()?;
     info!("Wifi started");
 
-    // wifi.connect()?;
-    // info!("Wifi connected");
-
     wifi.wait_netif_up()?;
     info!("Wifi netif up");
 
     Ok(())
 }
 
+/// Dummy values to exercise the trans chart
 fn _trans_values() {
     thread::spawn(|| {
         loop {
